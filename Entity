@@ -1,0 +1,57 @@
+package com.mphasis.usermanagementservice.entity;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "USERS")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long usrId;
+
+    private String usrFirstName;
+    private String usrLastName;
+    private String usrEmail;
+    private String usrPsswd;
+
+    public Long getUsrId() {
+        return usrId;
+    }
+
+    public void setUsrId(Long usrId) {
+        this.usrId = usrId;
+    }
+
+    public String getUsrFirstName() {
+        return usrFirstName;
+    }
+
+    public void setUsrFirstName(String usrFirstName) {
+        this.usrFirstName = usrFirstName;
+    }
+
+    public String getUsrLastName() {
+        return usrLastName;
+    }
+
+    public void setUsrLastName(String usrLastName) {
+        this.usrLastName = usrLastName;
+    }
+
+    public String getUsrEmail() {
+        return usrEmail;
+    }
+
+    public void setUsrEmail(String usrEmail) {
+        this.usrEmail = usrEmail;
+    }
+
+    public String getUsrPsswd() {
+        return usrPsswd;
+    }
+
+    public void setUsrPsswd(String usrPsswd) {
+        this.usrPsswd = usrPsswd;
+    }
+}
