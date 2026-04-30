@@ -1,0 +1,48 @@
+package com.mphasis.usermanagementservice.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import com.mphasis.usermanagementservice.entity.User;
+import com.mphasis.usermanagementservice.service.UserService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    private UserService service;
+
+    // GET /user
+    @GetMapping
+    public List<User> getAllUsers() {
+        return service.getAllUsers();
+    }
+
+    // GET /user/{id}
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+        return service.getUserById(id);
+    }
+
+    // POST /user
+    @PostMapping
+    public User createUser(@RequestBody User user) {
+        return service.saveUser(user);
+    }
+
+    // PUT /user/{id}
+    @PutMapping("/{id}")
+    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+        user.setUsrId(id);
+        return service.saveUser(user);
+    }
+
+    // DELETE /user/{id}
+    @DeleteMapping("/{id}")
+    public String deleteUser(@PathVariable Long id) {
+        service.deleteUser(id);
+        return "User deleted";
+    }
+}
