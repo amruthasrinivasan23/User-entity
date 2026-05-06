@@ -1,0 +1,82 @@
+package com.mphasis.usermanagementservice.service;
+
+import com.mphasis.usermanagementservice.entity.Role;
+import com.mphasis.usermanagementservice.entity.User;
+import com.mphasis.usermanagementservice.repository.RoleRepository;
+import com.mphasis.usermanagementservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    // CREATE USER
+    public User createUser(User user) {
+
+        List<Role> roles = new ArrayList<>();
+
+        for (Role role : user.getRoles()) {
+
+            Role dbRole = roleRepository.findById(role.getRoleId()).get();
+
+            roles.add(dbRole);
+        }
+
+        user.setRoles(roles);
+
+        return userRepository.save(user);
+    }
+
+    // GET ALL USERS
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // GET USER BY ID
+    public User getUserById(Integer id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    // UPDATE USER
+    public User updateUser(Integer id, User user) {
+
+        User existingUser = userRepository.findById(id).orElse(null);
+
+        if (existingUser != null) {
+
+            existingUser.setUsrFirstName(user.getUsrFirstName());
+            existingUser.setUsrLastName(user.getUsrLastName());
+            existingUser.setUsrEmail(user.getUsrEmail());
+            existingUser.setUsrPsswd(user.getUsrPsswd());
+
+            List<Role> roles = new ArrayList<>();
+
+            for (Role role : user.getRoles()) {
+
+                Role dbRole = roleRepository.findById(role.getRoleId()).get();
+
+                roles.add(dbRole);
+            }
+
+            existingUser.setRoles(roles);
+
+            return userRepository.save(existingUser);
+        }
+
+        return null;
+    }
+
+    // DELETE USER
+    public void deleteUser(Integer id) {
+        userRepository.deleteById(id);
+    }
+}
