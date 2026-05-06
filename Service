@@ -1,0 +1,52 @@
+package com.mphasis.usermanagementservice.service;
+
+import com.mphasis.usermanagementservice.entity.Role;
+import com.mphasis.usermanagementservice.entity.User;
+import com.mphasis.usermanagementservice.repository.RoleRepository;
+import com.mphasis.usermanagementservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Service
+public class UserService {
+
+    @Autowired
+    private UserRepository repo;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    public List<User> getAllUsers() {
+        return repo.findAll();
+    }
+
+    public User getUserById(Integer id) {
+        return repo.findById(id).orElse(null);
+    }
+
+    public User saveUser(User user) {
+
+        Set<Role> roles = new HashSet<>();
+
+        for (Role r : user.getRoles()) {
+
+            Role role = roleRepository.findById(r.getRoleId()).orElse(null);
+
+            if (role != null) {
+                roles.add(role);
+            }
+        }
+
+        user.setRoles(roles);
+
+        return repo.save(user);
+    }
+
+    public void deleteUser(Integer id) {
+        repo.deleteById(id);
+    }
+}
