@@ -1,0 +1,82 @@
+package com.mphasis.usermanagementservice.entity;
+
+import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "users")
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "USR_ID")
+    private Integer usrId;
+
+    @Column(name = "USR_FIRST_NAME")
+    private String usrFirstName;
+
+    @Column(name = "USR_LAST_NAME")
+    private String usrLastName;
+
+    @Column(name = "USR_EMAIL")
+    private String usrEmail;
+
+    @Column(name = "USR_PSSWD")
+    private String usrPsswd;
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_role",
+        joinColumns = @JoinColumn(name = "USR_ID"),
+        inverseJoinColumns = @JoinColumn(name = "ROLE_ID")
+    )
+    private List<Role> roles;
+
+    public Integer getUsrId() {
+        return usrId;
+    }
+
+    public void setUsrId(Integer usrId) {
+        this.usrId = usrId;
+    }
+
+    public String getUsrFirstName() {
+        return usrFirstName;
+    }
+
+    public void setUsrFirstName(String usrFirstName) {
+        this.usrFirstName = usrFirstName;
+    }
+
+    public String getUsrLastName() {
+        return usrLastName;
+    }
+
+    public void setUsrLastName(String usrLastName) {
+        this.usrLastName = usrLastName;
+    }
+
+    public String getUsrEmail() {
+        return usrEmail;
+    }
+
+    public void setUsrEmail(String usrEmail) {
+        this.usrEmail = usrEmail;
+    }
+
+    public String getUsrPsswd() {
+        return usrPsswd;
+    }
+
+    public void setUsrPsswd(String usrPsswd) {
+        this.usrPsswd = usrPsswd;
+    }
+
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+}
