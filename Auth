@@ -1,0 +1,44 @@
+package com.mphasis.usermanagementservice.controller;
+
+import com.mphasis.usermanagementservice.security.JwtUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+public class AuthController {
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @PostMapping("/authenticate")
+    public Map<String, String> authenticate(
+            @RequestBody Map<String, String> authRequest) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.get("usrEmail"),
+                        authRequest.get("usrPsswd")
+                )
+        );
+
+        String token =
+                jwtUtil.generateToken(authRequest.get("usrEmail"));
+
+        Map<String, String> response = new HashMap<>();
+
+        response.put("token", token);
+
+        return response;
+    }
+}
