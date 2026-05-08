@@ -1,0 +1,7 @@
+@Bean
+public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
+
+    return org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance();
+}
+
+
