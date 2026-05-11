@@ -1,0 +1,8 @@
+user.getRoles().forEach(role ->
+    System.out.println("DB ROLE -> " + role.getRoleName()));
+
+System.out.println(
+    user.getRoles().stream()
+        .map(role -> "ROLE_" + role.getRoleName())
+        .toList()
+);
