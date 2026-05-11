@@ -1,0 +1,13 @@
+return new org.springframework.security.core.userdetails.User(
+        user.getUsrEmail(),
+        user.getUsrPsswd(),
+
+        user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName()))
+                .collect(Collectors.toList())
+);
+
+
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
