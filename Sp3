@@ -1,0 +1,39 @@
+User Story: As a developer, I want to create the FileLoad entity, so that I can represent file load information in the database.
+
+Acceptance Criteria:
+
+The model module contains the FileLoad entity class.
+
+The FileLoad entity includes fields for
+
+id (primary key, auto-generated)
+
+filename
+
+loadDate (timestamp)
+
+status
+
+recordCount
+
+errors (string for error messages, or a collection of errors)
+
+The FileLoad entity is annotated with @Entity and JPA annotations.
+
+The FileLoad entity defines the mapping to the file load staging table in the database.
+
+2. User Story: As a developer, I want to create DTOs for API requests and responses, so that I can control the data format.
+
+Acceptance Criteria:
+
+The model module contains DTO classes for
+
+FileLoadRequestDTO (for creating/updating file loads)
+
+FileLoadResponseDTO (for returning file load information)
+
+Search Criteria DTO (for defining search parameters)
+
+DTOs include only the necessary fields for each operation
+
+DTOs are annotated with validation annotations (e.g. @NotNull Size Pattem) where appropriate.
