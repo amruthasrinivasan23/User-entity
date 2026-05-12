@@ -1,0 +1,50 @@
+package com.mphasis.usermanagementservice.dto;
+
+import jakarta.validation.constraints.Pattern;
+
+public class SearchCriteriaDTO {
+
+    private String filename;
+
+    @Pattern(
+            regexp = "SUCCESS|FAILED|PROCESSING",
+            message = "Status must be SUCCESS, FAILED or PROCESSING"
+    )
+    private String status;
+
+    private Integer minRecordCount;
+
+    private Integer maxRecordCount;
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getMinRecordCount() {
+        return minRecordCount;
+    }
+
+    public void setMinRecordCount(Integer minRecordCount) {
+        this.minRecordCount = minRecordCount;
+    }
+
+    public Integer getMaxRecordCount() {
+        return maxRecordCount;
+    }
+
+    public void setMaxRecordCount(Integer maxRecordCount) {
+        this.maxRecordCount = maxRecordCount;
+    }
+}
