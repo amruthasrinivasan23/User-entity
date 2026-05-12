@@ -1,0 +1,78 @@
+package com.mphasis.usermanagementservice.entity;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "file_load_staging")
+public class FileLoad {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
+    private Long id;
+
+    @Column(name = "FILENAME")
+    private String filename;
+
+    @Column(name = "LOAD_DATE")
+    private LocalDateTime loadDate;
+
+    @Column(name = "STATUS")
+    private String status;
+
+    @Column(name = "RECORD_COUNT")
+    private Integer recordCount;
+
+    @Column(name = "ERRORS")
+    private String errors;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public LocalDateTime getLoadDate() {
+        return loadDate;
+    }
+
+    public void setLoadDate(LocalDateTime loadDate) {
+        this.loadDate = loadDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(Integer recordCount) {
+        this.recordCount = recordCount;
+    }
+
+    public String getErrors() {
+        return errors;
+    }
+
+    public void setErrors(String errors) {
+        this.errors = errors;
+    }
+}
