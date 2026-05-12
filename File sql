@@ -1,0 +1,14 @@
+CREATE TABLE file_load_staging (
+
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    filename VARCHAR(100),
+
+    load_date TIMESTAMP,
+
+    status VARCHAR(50),
+
+    record_count INT,
+
+    errors VARCHAR(500)
+);
