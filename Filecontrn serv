@@ -1,0 +1,102 @@
+package com.mphasis.usermanagementservice.controller;
+
+import com.mphasis.usermanagementservice.service.FileLoadService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+@RestController
+@RequestMapping("/file")
+public class FileUploadController {
+
+    @Autowired
+    private FileLoadService service;
+
+    @PostMapping("/upload")
+    public String uploadFile(
+            @RequestParam("file") MultipartFile file) {
+
+        return service.uploadFile(file);
+    }
+}
+
+
+
+
+
+package com.mphasis.usermanagementservice.service;
+
+import com.mphasis.usermanagementservice.entity.FileLoad;
+import com.mphasis.usermanagementservice.repository.FileLoadRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+
+@Service
+public class FileLoadService {
+
+    @Autowired
+    private FileLoadRepository repository;
+
+    public String uploadFile(MultipartFile file) {
+
+        FileLoad fileLoad = new FileLoad();
+
+        String filename = file.getOriginalFilename();
+
+        fileLoad.setFilename(filename);
+
+        fileLoad.setLoadDate(LocalDateTime.now());
+
+        int count = 0;
+
+        try {
+
+            if (filename.endsWith(".csv")
+                    || filename.endsWith(".txt")) {
+
+                BufferedReader reader =
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        file.getInputStream()));
+
+                while (reader.readLine() != null) {
+
+                    count++;
+                }
+
+                fileLoad.setStatus("SUCCESS");
+
+                fileLoad.setRecordCount(count);
+
+                fileLoad.setErrors(null);
+
+            } else {
+
+                fileLoad.setStatus("FAILED");
+
+                fileLoad.setRecordCount(0);
+
+                fileLoad.setErrors("Invalid file type");
+            }
+
+        } catch (Exception e) {
+
+            fileLoad.setStatus("FAILED");
+
+            fileLoad.setRecordCount(0);
+
+            fileLoad.setErrors(e.getMessage());
+        }
+
+        repository.save(fileLoad);
+
+        return "File processed successfully";
+    }
+}
