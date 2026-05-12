@@ -1,0 +1,52 @@
+package com.mphasis.usermanagementservice.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+public class FileLoadRequestDTO {
+
+    @NotBlank(message = "Filename is required")
+    @Size(min = 3, max = 100)
+    private String filename;
+
+    @NotBlank(message = "Status is required")
+    private String status;
+
+    @NotNull(message = "Record count is required")
+    private Integer recordCount;
+
+    private String errors;
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getRecordCount() {
+        return recordCount;
+    }
+
+    public void setRecordCount(Integer recordCount) {
+        this.recordCount = recordCount;
+    }
+
+    public String getErrors() {
+        return errors;
+    }
+
+    public void setErrors(String errors) {
+        this.errors = errors;
+    }
+}
