@@ -1,0 +1,16 @@
+CREATE TABLE trade_file (
+
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+    symbol CHAR(20),
+
+    mac_act_num CHAR(8),
+
+    description VARCHAR(100),
+
+    amount BIGINT,
+
+    create_date DATETIME,
+
+    create_by VARCHAR(20)
+);
