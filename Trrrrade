@@ -1,0 +1,3 @@
+ALTER TABLE trade_file
+ADD update_date DATETIME,
+ADD update_by VARCHAR(20);
