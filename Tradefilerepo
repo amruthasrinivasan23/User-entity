@@ -1,0 +1,12 @@
+package com.mphasis.usermanagementservice.repository;
+
+import com.mphasis.usermanagementservice.entity.TradeFile;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface TradeFileRepository
+        extends JpaRepository<TradeFile, Long> {
+
+}
