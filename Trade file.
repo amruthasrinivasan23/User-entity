@@ -1,0 +1,91 @@
+package com.mphasis.usermanagementservice.entity;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "trade_file")
+public class TradeFile {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "symbol")
+    private String symbol;
+
+    @Column(name = "ma_act_num")
+    private String maActNum;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "amount")
+    private Long amount;
+
+    @Column(name = "create_date")
+    private LocalDateTime createDate;
+
+    @Column(name = "create_by")
+    private String createBy;
+
+    @Column(name = "update_date")
+    private LocalDateTime updateDate;
+
+    @Column(name = "update_by")
+    private String updateBy;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public String getMaActNum() {
+        return maActNum;
+    }
+
+    public void setMaActNum(String maActNum) {
+        this.maActNum = maActNum;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Long amount) {
+        this.amount = amount;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String
