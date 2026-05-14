@@ -64,3 +64,9 @@ public class FileLoadResponseDTO {
         this.errors = errors;
     }
 }
+
+
+
+ALTER TABLE trade_file
+CHANGE mac_act_num ma_act_num CHAR(8),
+MODIFY amount DECIMAL(10,0);
