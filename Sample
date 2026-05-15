@@ -1,0 +1,4 @@
+symbol,maActNum,description,amount,createBy,updateBy
+TCS,12345678,Laptop Sale,5000,admin,admin
+INFY,87654321,Software Sale,9000,admin,admin
+WIPRO,11223344,Testing,7000,admin,admin
