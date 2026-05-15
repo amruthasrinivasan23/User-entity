@@ -1,0 +1,38 @@
+package com.mphasis.usermanagementservice.config;
+
+import com.mphasis.usermanagementservice.entity.TradeFile;
+import com.mphasis.usermanagementservice.repository.TradeFileRepository;
+
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+
+import org.springframework.batch.item.file.FlatFileItemReader;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import org.springframework.core.io.FileSystemResource;
+
+@Configuration
+@EnableBatchProcessing
+public class BatchConfig {
+
+    @Autowired
+    private TradeFileRepository repository;
+
+    @Bean
+    public FlatFileItemReader<TradeFile> reader() {
+
+        FlatFileItemReader<TradeFile> reader =
+                new FlatFileItemReader<>();
+
+        reader.setResource(
+                new FileSystemResource("sample_trade.csv"));
+
+        reader.setLinesToSkip(1);
+
+        reader.setName("tradeReader");
+
+        return reader;
+    }
+}
