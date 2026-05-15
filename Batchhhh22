@@ -1,0 +1,119 @@
+package com.mphasis.usermanagementservice.config;
+
+import com.mphasis.usermanagementservice.entity.TradeFile;
+import com.mphasis.usermanagementservice.repository.TradeFileRepository;
+
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
+
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.data.RepositoryItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import org.springframework.core.io.FileSystemResource;
+
+import org.springframework.transaction.PlatformTransactionManager;
+
+@Configuration
+@EnableBatchProcessing
+public class BatchConfig {
+
+    private final TradeFileRepository repository;
+
+    public BatchConfig(TradeFileRepository repository) {
+        this.repository = repository;
+    }
+
+    @Bean
+    public FlatFileItemReader<TradeFile> reader() {
+
+        FlatFileItemReader<TradeFile> reader = new FlatFileItemReader<>();
+
+        reader.setResource(new FileSystemResource("sample_trade.csv"));
+
+        reader.setLinesToSkip(1);
+
+        DefaultLineMapper<TradeFile> lineMapper =
+                new DefaultLineMapper<>();
+
+        DelimitedLineTokenizer tokenizer =
+                new DelimitedLineTokenizer();
+
+        tokenizer.setDelimiter(",");
+
+        tokenizer.setNames(
+                "SYMBOL",
+                "MA_ACT_NUM",
+                "DESCRIPTION",
+                "AMOUNT"
+        );
+
+        BeanWrapperFieldSetMapper<TradeFile> fieldSetMapper =
+                new BeanWrapperFieldSetMapper<>();
+
+        fieldSetMapper.setTargetType(TradeFile.class);
+
+        lineMapper.setLineTokenizer(tokenizer);
+        lineMapper.setFieldSetMapper(fieldSetMapper);
+
+        reader.setLineMapper(lineMapper);
+
+        return reader;
+    }
+
+    @Bean
+    public ItemProcessor<TradeFile, TradeFile> processor() {
+
+        return item -> {
+
+            item.setCREATE_BY("ADMIN");
+
+            return item;
+        };
+    }
+
+    @Bean
+    public RepositoryItemWriter<TradeFile> writer() {
+
+        RepositoryItemWriter<TradeFile> writer =
+                new RepositoryItemWriter<>();
+
+        writer.setRepository(repository);
+
+        writer.setMethodName("save");
+
+        return writer;
+    }
+
+    @Bean
+    public Step step1(JobRepository jobRepository,
+                      PlatformTransactionManager transactionManager) {
+
+        return new StepBuilder("step1", jobRepository)
+                .<TradeFile, TradeFile>chunk(5)
+                .reader(reader())
+                .processor(processor())
+                .writer(writer())
+                .transactionManager(transactionManager)
+                .build();
+    }
+
+    @Bean
+    public Job job(JobRepository jobRepository,
+                   Step step1) {
+
+        return new JobBuilder("tradeJob", jobRepository)
+                .start(step1)
+                .build();
+    }
+}
