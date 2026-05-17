@@ -1,0 +1,75 @@
+package com.mphasis.usermanagementservice.service;
+
+import com.mphasis.usermanagementservice.entity.TradeFile;
+import com.mphasis.usermanagementservice.repository.TradeFileRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+@Service
+public class FileService {
+
+    @Autowired
+    private TradeFileRepository repository;
+
+    public void saveFileData(MultipartFile file) {
+
+        try {
+
+            String fileName = file.getOriginalFilename();
+
+            if (fileName == null ||
+                    (!fileName.endsWith(".csv")
+                            && !fileName.endsWith(".txt"))) {
+
+                throw new RuntimeException(
+                        "Only CSV and TXT files are allowed");
+            }
+
+            BufferedReader br =
+                    new BufferedReader(
+                            new InputStreamReader(
+                                    file.getInputStream()));
+
+            String line;
+
+            br.readLine();
+
+            while ((line = br.readLine()) != null) {
+
+                String[] data;
+
+                if (fileName.endsWith(".csv")) {
+
+                    data = line.split(",");
+
+                } else {
+
+                    data = line.split("\\|");
+                }
+
+                if (data.length < 4) {
+
+                    continue;
+                }
+
+                TradeFile trade = new TradeFile();
+
+                trade.setSYMBOL(data[0]);
+                trade.setMA_ACT_NUM(data[1]);
+                trade.setDESCRIPTION(data[2]);
+                trade.setAMOUNT(Double.parseDouble(data[3]));
+
+                repository.save(trade);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+    }
+}
