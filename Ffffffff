@@ -46,3 +46,13 @@ public class FileService {
                 trade.setSYMBOL(data[0]);
                 trade.setMA_ACT_NUM(data[1]);
                 trade.setDESCRIPTION(data[2]);
+                trade.setAMOUNT(new BigDecimal(data[3]));
+
+                repository.save(trade);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
