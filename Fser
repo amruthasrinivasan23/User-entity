@@ -1,0 +1,135 @@
+package com.mphasis.usermanagementservice.service;
+
+import com.mphasis.usermanagementservice.entity.FileLoad;
+import com.mphasis.usermanagementservice.entity.TradeFile;
+import com.mphasis.usermanagementservice.repository.FileLoadRepository;
+import com.mphasis.usermanagementservice.repository.TradeFileRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+
+@Service
+public class FileService {
+
+    @Autowired
+    private TradeFileRepository repository;
+
+    @Autowired
+    private FileLoadRepository fileLoadRepository;
+
+    public void saveFileData(MultipartFile file) {
+
+        int count = 0;
+
+        try {
+
+            BufferedReader reader =
+                    new BufferedReader(
+                            new InputStreamReader(file.getInputStream()));
+
+            String line;
+
+            // skip header row
+            reader.readLine();
+
+            while ((line = reader.readLine()) != null) {
+
+                String[] data;
+
+                if (file.getOriginalFilename().endsWith(".csv")) {
+                    data = line.split(",");
+                } else if (file.getOriginalFilename().endsWith(".txt")) {
+                    data = line.split("\\|");
+                } else {
+
+                    FileLoad failedLoad = new FileLoad();
+
+                    failedLoad.setFilename(file.getOriginalFilename());
+                    failedLoad.setLoadDate(LocalDateTime.now());
+                    failedLoad.setStatus("FAILED");
+                    failedLoad.setRecordCount(0);
+                    failedLoad.setErrors("Invalid file type");
+
+                    fileLoadRepository.save(failedLoad);
+
+                    return;
+                }
+
+                // validation
+                if (data.length < 4) {
+                    continue;
+                }
+
+                if (data[0] == null || data[0].trim().isEmpty()) {
+                    continue;
+                }
+
+                if (data[1] == null || data[1].trim().isEmpty()) {
+                    continue;
+                }
+
+                if (data[2] == null || data[2].trim().isEmpty()) {
+                    continue;
+                }
+
+                if (data[3] == null || data[3].trim().isEmpty()) {
+                    continue;
+                }
+
+                TradeFile trade = new TradeFile();
+
+                trade.setSymbol(data[0]);
+                trade.setMaActNum(data[1]);
+                trade.setDescription(data[2]);
+                trade.setAmount(Long.parseLong(data[3]));
+
+                Authentication authentication =
+                        SecurityContextHolder.getContext().getAuthentication();
+
+                String username = authentication.getName();
+
+                trade.setCreateBy(username);
+                trade.setUpdateBy(username);
+
+                trade.setCreateDate(LocalDateTime.now());
+                trade.setUpdateDate(LocalDateTime.now());
+
+                repository.save(trade);
+
+                count++;
+            }
+
+            // success entry in staging table
+            FileLoad successLoad = new FileLoad();
+
+            successLoad.setFilename(file.getOriginalFilename());
+            successLoad.setLoadDate(LocalDateTime.now());
+            successLoad.setStatus("SUCCESS");
+            successLoad.setRecordCount(count);
+            successLoad.setErrors(null);
+
+            fileLoadRepository.save(successLoad);
+
+        } catch (Exception e) {
+
+            FileLoad failedLoad = new FileLoad();
+
+            failedLoad.setFilename(file.getOriginalFilename());
+            failedLoad.setLoadDate(LocalDateTime.now());
+            failedLoad.setStatus("FAILED");
+            failedLoad.setRecordCount(0);
+            failedLoad.setErrors(e.getMessage());
+
+            fileLoadRepository.save(failedLoad);
+
+            e.printStackTrace();
+        }
+    }
+}
