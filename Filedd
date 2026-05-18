@@ -1,0 +1,205 @@
+package com.mphasis.usermanagementservice.service;
+
+import com.mphasis.usermanagementservice.entity.FileLoad;
+import com.mphasis.usermanagementservice.entity.TradeFile;
+import com.mphasis.usermanagementservice.repository.FileLoadRepository;
+import com.mphasis.usermanagementservice.repository.TradeFileRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+
+@Service
+public class FileService {
+
+    @Autowired
+    private TradeFileRepository repository;
+
+    @Autowired
+    private FileLoadRepository fileLoadRepository;
+
+    public void saveFileData(MultipartFile file) {
+
+        int count = 0;
+        int lineNumber = 0;
+
+        StringBuilder errors = new StringBuilder();
+
+        try {
+
+            BufferedReader reader =
+                    new BufferedReader(
+                            new InputStreamReader(file.getInputStream()));
+
+            String line;
+
+            // skip header
+            reader.readLine();
+
+            while ((line = reader.readLine()) != null) {
+
+                lineNumber++;
+
+                String[] data;
+
+                if (file.getOriginalFilename().endsWith(".csv")) {
+
+                    data = line.split(",");
+
+                } else if (file.getOriginalFilename().endsWith(".txt")) {
+
+                    data = line.split("\\|");
+
+                } else {
+
+                    errors.append("Invalid file type\n");
+                    break;
+                }
+
+                // validation 1
+                if (data.length < 4) {
+
+                    errors.append(
+                            "Invalid field count at line ")
+                            .append(lineNumber)
+                            .append("\n");
+
+                    continue;
+                }
+
+                // validation 2
+                if (data[0] == null || data[0].trim().isEmpty()) {
+
+                    errors.append(
+                            "Symbol is empty at line ")
+                            .append(lineNumber)
+                            .append("\n");
+
+                    continue;
+                }
+
+                if (data[1] == null || data[1].trim().isEmpty()) {
+
+                    errors.append(
+                            "MA_ACT_NUM is empty at line ")
+                            .append(lineNumber)
+                            .append("\n");
+
+                    continue;
+                }
+
+                if (data[2] == null || data[2].trim().isEmpty()) {
+
+                    errors.append(
+                            "Description is empty at line ")
+                            .append(lineNumber)
+                            .append("\n");
+
+                    continue;
+                }
+
+                if (data[3] == null || data[3].trim().isEmpty()) {
+
+                    errors.append(
+                            "Amount is empty at line ")
+                            .append(lineNumber)
+                            .append("\n");
+
+                    continue;
+                }
+
+                Long amount;
+
+                // validation 3
+                try {
+
+                    amount = Long.parseLong(data[3].trim());
+
+                } catch (Exception e) {
+
+                    errors.append(
+                            "Invalid amount at line ")
+                            .append(lineNumber)
+                            .append("\n");
+
+                    continue;
+                }
+
+                // validation 4
+                if (amount <= 0) {
+
+                    errors.append(
+                            "Amount must be positive at line ")
+                            .append(lineNumber)
+                            .append("\n");
+
+                    continue;
+                }
+
+                TradeFile trade = new TradeFile();
+
+                trade.setSymbol(data[0].trim());
+                trade.setMaActNum(data[1].trim());
+                trade.setDescription(data[2].trim());
+                trade.setAmount(amount);
+
+                Authentication authentication =
+                        SecurityContextHolder
+                                .getContext()
+                                .getAuthentication();
+
+                String username = authentication.getName();
+
+                trade.setCreateBy(username);
+                trade.setUpdateBy(username);
+
+                trade.setCreateDate(LocalDateTime.now());
+                trade.setUpdateDate(LocalDateTime.now());
+
+                repository.save(trade);
+
+                count++;
+            }
+
+            // staging table update
+            FileLoad fileLoad = new FileLoad();
+
+            fileLoad.setFilename(file.getOriginalFilename());
+            fileLoad.setLoadDate(LocalDateTime.now());
+
+            if (errors.length() > 0) {
+
+                fileLoad.setStatus("FAILED");
+
+            } else {
+
+                fileLoad.setStatus("SUCCESS");
+            }
+
+            fileLoad.setRecordCount(count);
+            fileLoad.setErrors(errors.toString());
+
+            fileLoadRepository.save(fileLoad);
+
+        } catch (Exception e) {
+
+            FileLoad fileLoad = new FileLoad();
+
+            fileLoad.setFilename(file.getOriginalFilename());
+            fileLoad.setLoadDate(LocalDateTime.now());
+            fileLoad.setStatus("FAILED");
+            fileLoad.setRecordCount(0);
+            fileLoad.setErrors(e.getMessage());
+
+            fileLoadRepository.save(fileLoad);
+
+            e.printStackTrace();
+        }
+    }
+}
