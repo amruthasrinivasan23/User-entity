@@ -1,0 +1,65 @@
+Acceptance Criteria:
+
+A Spring Batch job is defined in the service module.
+
+The job includes steps for:
+
+Reading data from the fixed-length file.
+
+Mapping the data to a Fileload entity or a staging entity.
+
+Writing the data to the staging table using Spring JDBC or JPA.
+
+The job configuration handles:
+
+File input source.
+
+File parsing (fixed-length format).
+
+Data mapping.
+
+Database writing.
+
+Error handling (skip policies, retry policaes).
+
+Transaction management.
+
+The job updates the FileLoad entity with the load status and record count.
+
+Table schema.
+
+TRADE_FILE(
+
+ID
+
+number auto increament primary key,
+
+SYMBOL
+
+char
+
+(20),
+
+MA_ACT_NUM
+
+char (8),
+
+DESCRIPTION
+
+varchar(100),
+
+AMOUNT
+
+number(10),
+
+CREATE_DATE
+
+DATETIME
+
+CREATE BY varchar(20),
+
+UPDATE DATE DATETIME,
+
+UPDATE BY
+
+varchar(20))
