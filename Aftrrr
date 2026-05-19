@@ -1,0 +1,31 @@
+User Story: As a developer, I want to create REST controllers, so that I can expose the file lead management API.
+
+Acceptance Criteria:
+
+The api module contains the FileLoadController class.
+
+The FileLoadController is annotated with @RestController
+
+The FileLoadController depends on the FileLoadService.
+
+The FileLoadController defines the following API endpoints:
+
+POST/api/file-loads: Creates a new file load (createFileload).
+
+GET/api/file-loads/(id): Retrieves a file load by ID (getFileLoad).
+
+GET/api/file-loads. Searches for file loads (searchFileLoads).
+
+PUT/api/file-loads/[id]/status: Updates the status of a file load (updateFileLoadStatus).
+
+DELETE/api/file-loads/(id): Deletes a file load (deleteFileLoad). POST/api/file-loads/(id)/archive: Archives a file load (archiveFileLoad).
+
+The controllers handle HTTP requests and responses.
+
+The controllers use DTOs for request and response bodies.
+
+The controllers are secured with JWT authentication and authorization (using PreAuthorize).
+
+The controllers include appropriate HTTP status codes.
+
+The controllers are documented with OpenAPI annotations.
