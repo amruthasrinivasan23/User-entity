@@ -1,0 +1,252 @@
+package com.mphasis.usermanagementservice.controller;
+
+import com.mphasis.usermanagementservice.dto.FileLoadRequestDto;
+import com.mphasis.usermanagementservice.dto.FileLoadResponseDto;
+import com.mphasis.usermanagementservice.service.FileLoadService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/file-loads")
+@RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
+public class FileLoadController {
+
+    private final FileLoadService fileLoadService;
+
+    // CREATE FILE LOAD
+    @Operation(summary = "Create File Load")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @PostMapping
+    public ResponseEntity<FileLoadResponseDto> createFileLoad(
+            @RequestBody FileLoadRequestDto requestDto) {
+
+        FileLoadResponseDto response =
+                fileLoadService.createFileLoad(requestDto);
+
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.CREATED);
+    }
+
+    // GET FILE LOAD BY ID
+    @Operation(summary = "Get File Load By Id")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @GetMapping("/{id}")
+    public ResponseEntity<FileLoadResponseDto> getFileLoad(
+            @PathVariable Long id) {
+
+        FileLoadResponseDto response =
+                fileLoadService.getFileLoad(id);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // SEARCH FILE LOADS
+    @Operation(summary = "Search File Loads")
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @GetMapping
+    public ResponseEntity<List<FileLoadResponseDto>>
+    searchFileLoads() {
+
+        List<FileLoadResponseDto> response =
+                fileLoadService.searchFileLoads();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // UPDATE STATUS
+    @Operation(summary = "Update File Load Status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/status")
+    public ResponseEntity<FileLoadResponseDto>
+    updateFileLoadStatus(
+
+            @PathVariable Long id,
+
+            @RequestParam String status) {
+
+        FileLoadResponseDto response =
+                fileLoadService
+                        .updateFileLoadStatus(id, status);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // DELETE FILE LOAD
+    @Operation(summary = "Delete File Load")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFileLoad(
+            @PathVariable Long id) {
+
+        fileLoadService.deleteFileLoad(id);
+
+        return ResponseEntity.ok(
+                "File Load Deleted Successfully");
+    }
+
+    // ARCHIVE FILE LOAD
+    @Operation(summary = "Archive File Load")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/archive")
+    public ResponseEntity<String> archiveFileLoad(
+            @PathVariable Long id) {
+
+        fileLoadService.archiveFileLoad(id);
+
+        return ResponseEntity.ok(
+                "File Load Archived Successfully");
+    }
+}
+
+
+
+
+FileLoadResponseDto createFileLoad(
+        FileLoadRequestDto requestDto);
+
+FileLoadResponseDto getFileLoad(Long id);
+
+List<FileLoadResponseDto> searchFileLoads();
+
+FileLoadResponseDto updateFileLoadStatus(
+        Long id,
+        String status);
+
+void deleteFileLoad(Long id);
+
+void archiveFileLoad(Long id);
+
+
+
+
+package com.mphasis.usermanagementservice.service.impl;
+
+import com.mphasis.usermanagementservice.dto.FileLoadRequestDto;
+import com.mphasis.usermanagementservice.dto.FileLoadResponseDto;
+import com.mphasis.usermanagementservice.entity.FileLoad;
+import com.mphasis.usermanagementservice.repository.FileLoadRepository;
+import com.mphasis.usermanagementservice.service.FileLoadService;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class FileLoadServiceImpl
+        implements FileLoadService {
+
+    private final FileLoadRepository repository;
+
+    @Override
+    public FileLoadResponseDto createFileLoad(
+            FileLoadRequestDto requestDto) {
+
+        FileLoad fileLoad = new FileLoad();
+
+        fileLoad.setFilename(requestDto.getFilename());
+        fileLoad.setStatus(requestDto.getStatus());
+        fileLoad.setRecordCount(
+                requestDto.getRecordCount());
+
+        fileLoad.setLoadDate(LocalDateTime.now());
+
+        repository.save(fileLoad);
+
+        return mapToDto(fileLoad);
+    }
+
+    @Override
+    public FileLoadResponseDto getFileLoad(Long id) {
+
+        FileLoad fileLoad =
+                repository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "File Load Not Found"));
+
+        return mapToDto(fileLoad);
+    }
+
+    @Override
+    public List<FileLoadResponseDto>
+    searchFileLoads() {
+
+        return repository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public FileLoadResponseDto updateFileLoadStatus(
+            Long id,
+            String status) {
+
+        FileLoad fileLoad =
+                repository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "File Load Not Found"));
+
+        fileLoad.setStatus(status);
+
+        repository.save(fileLoad);
+
+        return mapToDto(fileLoad);
+    }
+
+    @Override
+    public void deleteFileLoad(Long id) {
+
+        repository.deleteById(id);
+    }
+
+    @Override
+    public void archiveFileLoad(Long id) {
+
+        FileLoad fileLoad =
+                repository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "File Load Not Found"));
+
+        fileLoad.setStatus("ARCHIVED");
+
+        repository.save(fileLoad);
+    }
+
+    private FileLoadResponseDto mapToDto(
+            FileLoad fileLoad) {
+
+        FileLoadResponseDto dto =
+                new FileLoadResponseDto();
+
+        dto.setId(fileLoad.getId());
+        dto.setFilename(fileLoad.getFilename());
+        dto.setStatus(fileLoad.getStatus());
+        dto.setRecordCount(
+                fileLoad.getRecordCount());
+
+        dto.setLoadDate(fileLoad.getLoadDate());
+
+        return dto;
+    }
+}
+
