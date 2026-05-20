@@ -25,3 +25,20 @@ public FileLoadResponseDTO getFileLoad(Long id) {
 
     return dto;
 }
+
+
+
+
+FileLoad fileLoad = optional.get();
+
+FileLoadResponseDTO dto = new FileLoadResponseDTO();
+
+dto.setId(fileLoad.getId());
+dto.setFilename(fileLoad.getFilename());
+dto.setLoadDate(fileLoad.getLoadDate());
+dto.setStatus(fileLoad.getStatus());
+dto.setRecordCount(fileLoad.getRecordCount());
+dto.setErrors(fileLoad.getErrors());
+
+return dto;
+}
