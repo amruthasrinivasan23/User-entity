@@ -1,0 +1,27 @@
+import java.util.List;
+import java.util.Optional;
+
+import com.mphasis.usermanagementservice.dto.FileLoadResponseDTO;
+import com.mphasis.usermanagementservice.dto.SearchCriteriaDTO;
+
+public FileLoadResponseDTO getFileLoad(Long id) {
+
+    Optional<FileLoad> optional = repository.findById(id);
+
+    if (optional.isEmpty()) {
+        throw new RuntimeException("File Load Not Found");
+    }
+
+    FileLoad fileLoad = optional.get();
+
+    FileLoadResponseDTO dto = new FileLoadResponseDTO();
+
+    dto.setId(fileLoad.getId());
+    dto.setFilename(fileLoad.getFilename());
+    dto.setLoadDate(fileLoad.getLoadDate());
+    dto.setStatus(fileLoad.getStatus());
+    dto.setRecordCount(fileLoad.getRecordCount());
+    dto.setErrors(fileLoad.getErrors());
+
+    return dto;
+}
