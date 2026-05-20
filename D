@@ -1,0 +1,105 @@
+@PutMapping("/{id}/status")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<String> updateFileLoadStatus(
+        @PathVariable Long id,
+        @RequestBody UpdateStatusDTO dto) {
+
+    fileLoadService.updateFileLoadStatus(
+            id,
+            dto.getStatus());
+
+    return ResponseEntity.ok(
+            "File load status updated successfully");
+}
+
+
+
+@DeleteMapping("/{id}")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<String> deleteFileLoad(
+        @PathVariable Long id) {
+
+    fileLoadService.deleteFileLoad(id);
+
+    return ResponseEntity.ok(
+            "File load deleted successfully");
+}
+
+@PostMapping("/{id}/archive")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<String> archiveFileLoad(
+        @PathVariable Long id) {
+
+    fileLoadService.archiveFileLoad(id);
+
+    return ResponseEntity.ok(
+            "File load archived successfully");
+}
+///////////////
+public void updateFileLoadStatus(
+        Long id,
+        String status) {
+
+    Optional<FileLoad> optional =
+            repository.findById(id);
+
+    if (optional.isEmpty()) {
+        throw new RuntimeException(
+                "File Load Not Found");
+    }
+
+    FileLoad fileLoad = optional.get();
+
+    fileLoad.setStatus(status);
+
+    repository.save(fileLoad);
+}
+
+
+______
+public void deleteFileLoad(Long id) {
+
+    Optional<FileLoad> optional =
+            repository.findById(id);
+
+    if (optional.isEmpty()) {
+        throw new RuntimeException(
+                "File Load Not Found");
+    }
+
+    repository.deleteById(id);
+}
+
+
+________
+public void archiveFileLoad(Long id) {
+
+    Optional<FileLoad> optional =
+            repository.findById(id);
+
+    if (optional.isEmpty()) {
+        throw new RuntimeException(
+                "File Load Not Found");
+    }
+
+    FileLoad fileLoad = optional.get();
+
+    fileLoad.setStatus("ARCHIVED");
+
+    repository.save(fileLoad);
+}
+///////////
+package com.mphasis.usermanagementservice.dto;
+
+public class UpdateStatusDTO {
+
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}
