@@ -1,0 +1,40 @@
+public List<FileLoadResponseDTO> searchFileLoads(
+        SearchCriteriaDTO criteriaDTO) {
+
+    List<FileLoad> fileLoads = repository.findAll();
+
+    return fileLoads.stream()
+
+            .filter(file -> criteriaDTO.getFilename() == null
+                    || file.getFilename().contains(
+                    criteriaDTO.getFilename()))
+
+            .filter(file -> criteriaDTO.getStatus() == null
+                    || file.getStatus().equalsIgnoreCase(
+                    criteriaDTO.getStatus()))
+
+            .filter(file -> criteriaDTO.getMinRecordCount() == null
+                    || file.getRecordCount() >=
+                    criteriaDTO.getMinRecordCount())
+
+            .filter(file -> criteriaDTO.getMaxRecordCount() == null
+                    || file.getRecordCount() <=
+                    criteriaDTO.getMaxRecordCount())
+
+            .map(file -> {
+
+                FileLoadResponseDTO dto =
+                        new FileLoadResponseDTO();
+
+                dto.setId(file.getId());
+                dto.setFilename(file.getFilename());
+                dto.setLoadDate(file.getLoadDate());
+                dto.setStatus(file.getStatus());
+                dto.setRecordCount(file.getRecordCount());
+                dto.setErrors(file.getErrors());
+
+                return dto;
+            })
+
+            .toList();
+}
