@@ -1,0 +1,29 @@
+@PostMapping("/{id}/unarchive")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<String> unarchiveFileLoad(
+        @PathVariable Long id) {
+
+    fileLoadService.unarchiveFileLoad(id);
+
+    return ResponseEntity.ok(
+            "File load unarchived successfully");
+}
+
+
+
+public void unarchiveFileLoad(Long id) {
+
+    Optional<FileLoad> optional =
+            repository.findById(id);
+
+    if (optional.isEmpty()) {
+        throw new RuntimeException(
+                "File Load Not Found");
+    }
+
+    FileLoad fileLoad = optional.get();
+
+    fileLoad.setStatus("SUCCESS");
+
+    repository.save(fileLoad);
+}
